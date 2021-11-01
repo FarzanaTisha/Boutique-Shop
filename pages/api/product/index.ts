@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
-        const productData = JSON.parse(req.body);
+        const productData = req.body;
         const savedProduct = await prisma.product.create({
             data: productData
         })
@@ -13,8 +13,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     if (req.method === "GET") {
-        const productList = await prisma.product.findMany()
-        return res.status(200).json(productList);
+        try {
+            const productList = await prisma.product.findMany()
+            return res.status(200).json(productList);
+        } catch (error){
+            return res.status(500).json({
+                success : false,
+                message : 'Something went wrong'
+            })
+        }
     }
 
 }
